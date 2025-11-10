@@ -71,7 +71,7 @@ for i in `seq 1 2`; do
     echo '------------------------------------------'
     echo 'Creating webVM'$i
     az vm create \
-        --size Standard_DS1_v2
+        --size Standard_DS1_v2 \
 		--admin-username azureuser \
         --resource-group $RgName \
         --name webVM$i \
@@ -103,7 +103,7 @@ done
 
     echo 'Creating testVM'
     az vm create \
-        --size Standard_DS1_v2
+        --size Standard_DS1_v2 \
 		--admin-username azureuser \
         --resource-group $RgName \
         --name testVM \
