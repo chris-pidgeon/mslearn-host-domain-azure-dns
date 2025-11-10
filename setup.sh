@@ -1,7 +1,7 @@
 #!/bin/bash
 
-RgName=`LB-FrontendAccess-Scenario`
-Location=`australiaeast`
+RgName="LB-FrontendAccess-Scenario"
+Location="australiaeast"
 
 date
 # Create a Virtual Network for the VMs
