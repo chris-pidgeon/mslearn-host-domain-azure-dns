@@ -3,6 +3,9 @@
 RgName="LB-FrontendAccess-Scenario"
 Location="australiaeast"
 
+az group create --location Location
+                --name RgName
+
 date
 # Create a Virtual Network for the VMs
 echo '------------------------------------------'
