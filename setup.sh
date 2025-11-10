@@ -1,7 +1,7 @@
 #!/bin/bash
 
-RgName=`az group list --query '[0].name' --output tsv`
-Location=`az group list --query '[0].location' --output tsv`
+RgName=`LB-FrontendAccess-Scenario`
+Location=`australiaeast`
 
 date
 # Create a Virtual Network for the VMs
@@ -26,10 +26,26 @@ az network nsg rule create -g $RgName --nsg-name bePortalNSG -n AllowAll80 --pri
                             --destination-address-prefixes '*' --destination-port-ranges 80 --access Allow \
                             --protocol Tcp --description "Allow all port 80 traffic"
 
+az network nsg rule create -g $RgName --nsg-name bePortalNSG -n AllowSSH --priority 100 \
+                            --source-address-prefixes 'Internet' --source-port-ranges '*' \
+                            --destination-address-prefixes '*' --destination-port-ranges 22 --access Allow \
+                            --protocol Tcp --description "Allow SSH"
 
-# Create the NIC
+az network nsg rule create -g $RgName --nsg-name bePortalNSG -n AllowRDP --priority 102 \
+                            --source-address-prefixes 'Internet' --source-port-ranges '*' \
+                            --destination-address-prefixes '*' --destination-port-ranges 3389 --access Allow \
+                            --protocol Tcp --description "Allow RDP"
+
+
+# Create the NICs with associated public IPs
 for i in `seq 1 2`; do
   echo '------------------------------------------'
+  echo 'Creating webPublicIP'$i
+  az network public-ip create \
+    --resource-group $RgName \
+    --name webPublicIP$i \
+    --location $Location \
+    --sku Standard \
   echo 'Creating webNic'$i
   az network nic create \
     --resource-group $RgName \
@@ -37,8 +53,33 @@ for i in `seq 1 2`; do
     --vnet-name bePortalVnet \
     --subnet bePortalSubnet \
     --network-security-group bePortalNSG \
+    --public-ip-address webPublicIP$i \
     --location $Location
-done 
+done
+
+# Create the NICs with associated public IPs
+for i in `seq 1 2`; do
+  echo '------------------------------------------'
+  echo 'Creating webPublicIP'$i
+  az network public-ip create \
+    --resource-group $RgName \
+    --name webPublicIP$i \
+    --location $Location \
+    --sku Standard \
+  echo 'Creating webNic'$i
+  az network nic create \
+    --resource-group $RgName \
+    --name webNic$i \
+    --vnet-name bePortalVnet \
+    --subnet bePortalSubnet \
+    --network-security-group bePortalNSG \
+    --public-ip-address webPublicIP$i \
+    --location $Location
+done
+
+
+
+
 
 # Create an availability set
 echo '------------------------------------------'
@@ -52,7 +93,8 @@ for i in `seq 1 2`; do
     echo '------------------------------------------'
     echo 'Creating webVM'$i
     az vm create \
-        --admin-username azureuser \
+        --size Standard_DS1_v2
+		--admin-username azureuser \
         --resource-group $RgName \
         --name webVM$i \
         --nics webNic$i \
@@ -62,6 +104,37 @@ for i in `seq 1 2`; do
         --generate-ssh-keys \
         --custom-data cloud-init.txt
 done
+
+# Create TestVM NIC with associated public IP
+  echo '------------------------------------------'
+  echo 'Creating testVMPublicIP'$i
+  az network public-ip create \
+    --resource-group $RgName \
+    --name testVMPublicIP \
+    --location $Location \
+    --sku Standard \
+  echo 'Creating testVMNic'$i
+  az network nic create \
+    --resource-group $RgName \
+    --name testVMNic \
+    --vnet-name bePortalVnet \
+    --subnet bePortalSubnet \
+    --network-security-group bePortalNSG \
+    --public-ip-address testVMPublicIP \
+    --location $Location
+
+    echo 'Creating testVM'$i
+    az vm create \
+        --size Standard_DS1_v2
+		--admin-username azureuser \
+        --resource-group $RgName \
+        --name testVM \
+        --nics testVMNic \
+        --location $Location \
+        --image MicrosoftWindowsServer:WindowsServer:2019-Datacenter:latest \
+        --availability-set portalAvailabilitySet \
+        --generate-ssh-keys \
+
 
 # Done
 echo '--------------------------------------------------------'
@@ -83,7 +156,6 @@ echo '--------------------------------------------------------'
    az network lb create \
       --resource-group $RgName \
       --name myLoadBalancer \
-      --public-ip-address myPublicIP \
       --frontend-ip-name myFrontEndPool \
       --backend-pool-name myBackEndPool \
       --sku Standard
@@ -119,15 +191,15 @@ echo '--------------------------------------------------------'
       --lb-name myLoadBalancer \
       --lb-address-pools myBackEndPool
 
-  az network public-ip show \
-      --resource-group $RgName \
-      --name myPublicIP \
-      --query [ipAddress] \
-      --output tsv
+  # az network public-ip show \
+      # --resource-group $RgName \
+      # --name myPublicIP \
+      # --query [ipAddress] \
+      # --output tsv
 
-echo '--------------------------------------------------------'
-echo '  Load balancer deployed to the IP Address shown above'
-echo '--------------------------------------------------------'
+# echo '--------------------------------------------------------'
+# echo '  Load balancer deployed to the IP Address shown above'
+# echo '--------------------------------------------------------'
 
 
 
