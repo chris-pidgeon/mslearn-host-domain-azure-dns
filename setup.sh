@@ -47,7 +47,7 @@ for i in `seq 1 2`; do
     --resource-group $RgName \
     --name webPublicIP$i \
     --location $Location \
-    --sku Standard \
+    --sku Standard
   echo 'Creating webNic'$i
   az network nic create \
     --resource-group $RgName \
@@ -67,7 +67,7 @@ for i in `seq 1 2`; do
     --resource-group $RgName \
     --name webPublicIP$i \
     --location $Location \
-    --sku Standard \
+    --sku Standard
   echo 'Creating webNic'$i
   az network nic create \
     --resource-group $RgName \
@@ -114,7 +114,7 @@ done
     --resource-group $RgName \
     --name testVMPublicIP \
     --location $Location \
-    --sku Standard \
+    --sku Standard
   echo 'Creating testVMNic'$i
   az network nic create \
     --resource-group $RgName \
@@ -135,7 +135,7 @@ done
         --location $Location \
         --image MicrosoftWindowsServer:WindowsServer:2019-Datacenter:latest \
         --availability-set portalAvailabilitySet \
-        --generate-ssh-keys \
+        --generate-ssh-keys
 
 
 # Done
