@@ -85,13 +85,13 @@ done
 
 # Create TestVM NIC with associated public IP
   echo '------------------------------------------'
-  echo 'Creating testVMPublicIP'$i
+  echo 'Creating testVMPublicIP'
   az network public-ip create \
     --resource-group $RgName \
     --name testVMPublicIP \
     --location $Location \
     --sku Standard
-  echo 'Creating testVMNic'$i
+  echo 'Creating testVMNic'
   az network nic create \
     --resource-group $RgName \
     --name testVMNic \
@@ -101,7 +101,7 @@ done
     --public-ip-address testVMPublicIP \
     --location $Location
 
-    echo 'Creating testVM'$i
+    echo 'Creating testVM'
     az vm create \
         --size Standard_DS1_v2
 		--admin-username azureuser \
