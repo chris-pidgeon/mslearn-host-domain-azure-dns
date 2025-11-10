@@ -59,30 +59,6 @@ for i in `seq 1 2`; do
     --location $Location
 done
 
-# Create the NICs with associated public IPs
-for i in `seq 1 2`; do
-  echo '------------------------------------------'
-  echo 'Creating webPublicIP'$i
-  az network public-ip create \
-    --resource-group $RgName \
-    --name webPublicIP$i \
-    --location $Location \
-    --sku Standard
-  echo 'Creating webNic'$i
-  az network nic create \
-    --resource-group $RgName \
-    --name webNic$i \
-    --vnet-name bePortalVnet \
-    --subnet bePortalSubnet \
-    --network-security-group bePortalNSG \
-    --public-ip-address webPublicIP$i \
-    --location $Location
-done
-
-
-
-
-
 # Create an availability set
 echo '------------------------------------------'
 echo 'Creating an availability set'
@@ -147,13 +123,6 @@ echo '--------------------------------------------------------'
 echo '             Starting Load Balancer Deploy'
 echo '--------------------------------------------------------'
 
-
-    az network public-ip create \
-      --resource-group $RgName \
-      --location $Location \
-      --allocation-method Static \
-      --name myPublicIP \
-      --sku Standard
 
    az network lb create \
       --resource-group $RgName \
